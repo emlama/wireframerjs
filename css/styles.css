@@ -1,0 +1,40 @@
+#contain {
+  width: 960px;
+  margin: 0 auto;
+}
+
+nav {
+  width: 100%;
+  clear: both;
+  height: 50px;
+  margin-bottom: 20px;
+}
+
+nav > h1 {
+  float: left;
+  font-size: 24px;
+}
+
+nav > ul {
+  float: right;
+}
+
+nav ul li {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.col1 {
+  width: calc(75% - 40px);
+  margin-right: 40px;
+  float: left;
+}
+
+.col2 {
+  width: 25%;
+  float: right;
+}
+
+.col2 img {
+  width: 100%;
+}
