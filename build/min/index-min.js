@@ -1,0 +1,1 @@
+var Handlebars=require("handlebars"),logger=require("tracer").colorConsole({format:"{{timestamp}} <{{title}}> [Mapper] {{message}}",dateformat:"HH:MM:ss.l",level:"info"}),fs=require("fs"),source=fs.readFileSync("../sample/index.html");logger.info(logger);var template=Handlebars.compile(source);
