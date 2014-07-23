@@ -1,32 +1,65 @@
 var Handlebars = require('handlebars');
 var logger = require('tracer').colorConsole({
-  format : "{{timestamp}} <{{title}}> [Mapper] {{message}}",
+  format : "{{timestamp}} <{{title}}> {{message}}",
   dateformat : "HH:MM:ss.l",
   level:'info'
 });
 var fs = require('fs');
 var cheerio = require('cheerio');
 
-var source = fs.readFileSync('../sample/index.html');
+var source = fs.readFileSync('../sample/sample-template-files.html');
 var $ = cheerio.load(source, { decodeEntities: false });
 
 // gather up layouts
 var cheerioLayouts = $('layout');
-var pages = $('page');
-var tmps = $('template');
+var cheerioPages = $('page');
+var cheerioTmps = $('template');
 
 var layouts = [];
 var layoutsTemplates = [];
 
-cheerioLayouts.each(function (i, elem) {
-  var l = {};
+var pages = [];
+var pagesTemplates = [];
 
-  l.name = $(this).attr('name');
-  l.rawHTML = $(this).html();
-  layoutsTemplates.push("var lay" + l.name + " = " + Handlebars.precompile(l.rawHTML) + ";\n");
-  layouts.push(l);
+var pages = [];
+var pagesTemplates = [];
+
+var buildLocation = '../sample/compiledTemplates.js';
+
+cheerioPages.each(function (i, elem) {
+  var p = {};
+  var $this = $(this);
+
+  p.name = $this.attr('name');
+  p.layout = $this.attr('layout') || null;
+  // p.rawHTML = $this.html();
+  pagesTemplates.push(Handlebars.precompile($this.html()));
+  pages.push(p);
 });
 
-logger.info(layouts);
-fs.appendFileSync('../sample/compiledTemplates.js', "var layouts = " + JSON.stringify(layouts) + ";\n");
-fs.appendFileSync('../sample/compiledTemplates.js', layoutsTemplates[0]);
+appendTemplates(pagesTemplates, buildLocation, 'page');
+appendObject(pages, buildLocation, 'page');
+
+function appendTemplates (tmpArr, path, type) {
+
+  try {
+    fs.appendFileSync(path, "var " + type + "Tmps = [");
+
+    tmpArr.forEach(function(element, index, array) {
+      fs.appendFileSync(path, element);
+      if (array.length - 1 !== index) {
+        fs.appendFileSync(path, ", ");
+      }
+    });
+
+    fs.appendFileSync(path, "];\n");
+    return true;
+  } catch (e) {
+    logger.error(e);
+    return false;
+  }
+}
+
+function appendObject (objArr, path, type) {
+  fs.appendFileSync(path, "var " + type + "Data = " + JSON.stringify(objArr) + ";\n");
+}
