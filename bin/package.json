@@ -1,0 +1,21 @@
+{
+  "name": "build",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^0.17.0",
+    "fs-extra": "^0.10.0",
+    "handlebars": "^2.0.0-alpha.4",
+    "handlebars-layouts": "^0.3.3",
+    "livereload": "^0.3.4",
+    "node-static": "^0.7.4",
+    "tracer": "^0.7.1",
+    "underscore": "^1.6.0"
+  }
+}

@@ -1,2 +1,3 @@
-build/node_modules/
-scss/.sass-cache/
+bin/node_modules/
+bin/client/bower_components/
+bin/client/scss/.sass-cache/
