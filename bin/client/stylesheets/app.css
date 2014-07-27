@@ -1,0 +1,35 @@
+/* line 1, ../sass/app.scss */
+body, html {
+  height: 100%;
+}
+
+/* line 5, ../sass/app.scss */
+.wf-toolbar {
+  width: 100%;
+  height: 20px;
+  padding: 15px;
+  background-color: #333;
+  color: #FFF;
+}
+/* line 12, ../sass/app.scss */
+.wf-toolbar h1 {
+  font-size: 1em;
+  margin: 0;
+  line-height: 1em;
+  display: inline-block;
+}
+/* line 19, ../sass/app.scss */
+.wf-toolbar ul {
+  display: inline-block;
+  margin: 0;
+}
+/* line 22, ../sass/app.scss */
+.wf-toolbar ul li {
+  display: inline-block;
+  list-style: none;
+}
+
+/* line 29, ../sass/app.scss */
+.wf-iframe {
+  height: 100%;
+}
