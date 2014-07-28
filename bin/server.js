@@ -33,11 +33,15 @@ Server.prototype.startLivereload = function (watchpath) {
 };
 
 Server.prototype.runServer = function (path) {
-  var simpleServer = new staticServer.Server(path);
+  var simpleServer = new staticServer.Server(path, { cache: false });
 
   require('http').createServer(function (request, response) {
       request.addListener('end', function () {
-          simpleServer.serve(request, response);
+          simpleServer.serve(request, response, function (e, res) {
+            if (e && (e.status === 404)) {
+              simpleServer.serveFile('/index.html', 200, {}, request, response);
+            }
+          });
       }).resume();
   }).listen(8080);
 
