@@ -22,17 +22,29 @@ App.getParams = function () {
 
 App.currentPage = App.getParams().page;
 
-_.each(pagesData, function (element, index, array) {
-  console.log(element);
-  array[index].tmp = Handlebars.template(pagesTmps[index]);
+_.each(templatesData, function (element, index, array) {
+  array[index].tmp = Handlebars.template(templatesTmps[index]);
+  Handlebars.registerPartial(element.name, Handlebars.template(templatesTmps[index]));
 });
 
-console.log(pagesData);
+_.each(pagesData, function (element, index, array) {
+  array[index].tmp = Handlebars.template(pagesTmps[index]);
+  Handlebars.registerPartial(element.name, Handlebars.template(pagesTmps[index]));
+});
+
+_.each(layoutsData, function (element, index, array) {
+  array[index].tmp = Handlebars.template(layoutsTmps[index]);
+});
 
 var pageObj = _.find(pagesData, function (o) {
   return o.name === App.currentPage;
 });
 
-var newTemplate = pageObj.tmp();
+if (pageObj.layout !== undefined && pageObj.layout !== undefined) {
+  Handlebars.registerPartial('yield', Handlebars.template(pagesTmps[0]));
+  pageObj = layoutsData[0].tmp();
+}
+
+var newTemplate = pageObj;
 
 $('body').prepend(newTemplate);

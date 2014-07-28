@@ -86,7 +86,7 @@ Reader.prototype.processHTMLFile = function (file) {
   var cheerioLayouts = $('layout');
   var cheerioPages = $('page');
   var cheerioTmps = $('template');
-  // var cheerioHead = $('head');
+  var cheerioHeads = $('head');
 
   var htmlObject = {
     layouts: {
@@ -101,6 +101,10 @@ Reader.prototype.processHTMLFile = function (file) {
       data: [],
       tmps: []
     },
+    heads: {
+      data: [],
+      tmps: []
+    }
   }
 
   /**
@@ -139,6 +143,18 @@ Reader.prototype.processHTMLFile = function (file) {
     htmlObject.templates.data.push(p);
   });
 
+  cheerioHeads.each(function (i, elem) {
+    var p = {};
+    var $this = $(this);
+    var html = $this.html().trim();
+
+    // p.name = $this.attr('name');
+    // p.layout = $this.attr('layout') || null;
+    // p.rawHTML = $this.html();
+    htmlObject.heads.tmps.push($this.html());
+    // htmlObject.templates.data.push(p);
+  });
+
   reader.postal.publish({
     channel: 'HTML',
     topic: 'discovered',
@@ -162,6 +178,14 @@ Reader.prototype.processSiteFiles = function () {
 
       if (ext === '.html' || ext === '.htm') {
         reader.processHTMLFile(file);
+      } else if (fileStats.name === 'config.json') {
+        next();
+      } else {
+        reader.postal.publish({
+          channel: 'DOC',
+          topic: 'discovered',
+          data: file
+        });
       }
       next();
     });

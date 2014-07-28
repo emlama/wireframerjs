@@ -20,7 +20,8 @@ var App = {};
 App.settings = {
   buildLocation: path.join(process.cwd(), '/_site'),
   site: process.cwd(),
-  livereload: true
+  livereload: true,
+  launchonload: true
 };
 
 App.settings.binPath = path.dirname(
