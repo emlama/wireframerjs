@@ -70,7 +70,10 @@ Additionally, you can specify variations for templates. You do that like this:
 ```
 
 ### CSS/LESS/SASS
-This supports all of them with the idea that you should be able to bring your own framework. More TBD.
+Right now, all files except HTML files are copied over. Moreover, everything you put inside of a `<head>` tag is concatenated and added to the top of the page. That means you can add whatever CSS files you want and just include them.
+
+### Linking Pages
+You can link to your pages by just using their name like this `/pagename`.
 
 ### Annotations
 Where would wireframes be without documentation? You have a couple of options:
