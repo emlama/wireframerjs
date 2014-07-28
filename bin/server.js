@@ -41,7 +41,9 @@ Server.prototype.runServer = function (path) {
       }).resume();
   }).listen(8080);
 
-  opener('http://localhost:8080/');
+  if (this.settings.launchonload === true) {
+    opener('http://localhost:8080/');
+  }
 };
 
 module.exports = Server;
