@@ -43,10 +43,10 @@ Server.prototype.runServer = function (path) {
             }
           });
       }).resume();
-  }).listen(8080);
+  }).listen(3000);
 
   if (this.settings.launchonload === true) {
-    opener('http://localhost:8080/');
+    opener('http://localhost:3000/');
   }
 };
 
