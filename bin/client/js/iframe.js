@@ -1,7 +1,7 @@
 var App = App || {};
 var _ = _ || {};
-var pageData = pageData || {};
-var pageTmps = pageTmps || {};
+// var pageData = pagesData || {};
+// var pageTmps = pagesTmps || {};
 var Handlebars = Handlebars || {};
 
 App.getParams = function () {
@@ -20,19 +20,19 @@ App.getParams = function () {
   return urlParams;
 };
 
-var params = App.getParams();
-App.currentPage = params.page;
+App.currentPage = App.getParams().page;
 
-_.each(pageData, function (element, index, array) {
-  array[index].tmp = Handlebars.template(pageTmps[index]);
+_.each(pagesData, function (element, index, array) {
+  console.log(element);
+  array[index].tmp = Handlebars.template(pagesTmps[index]);
 });
 
-var pageObj = _.find(pageData, function (o) {
+console.log(pagesData);
+
+var pageObj = _.find(pagesData, function (o) {
   return o.name === App.currentPage;
 });
 
 var newTemplate = pageObj.tmp();
 
 $('body').prepend(newTemplate);
-
-console.log(pageData);
