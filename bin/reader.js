@@ -103,6 +103,9 @@ Reader.prototype.processHTMLFile = function (file) {
     },
   }
 
+  /**
+   * Reduce this down into a loop/function
+   */
   cheerioPages.each(function (i, elem) {
     var p = {};
     var $this = $(this);
@@ -112,6 +115,28 @@ Reader.prototype.processHTMLFile = function (file) {
     // p.rawHTML = $this.html();
     htmlObject.pages.tmps.push(Handlebars.precompile($this.html()));
     htmlObject.pages.data.push(p);
+  });
+
+  cheerioLayouts.each(function (i, elem) {
+    var p = {};
+    var $this = $(this);
+
+    p.name = $this.attr('name');
+    // p.layout = $this.attr('layout') || null;
+    // p.rawHTML = $this.html();
+    htmlObject.layouts.tmps.push(Handlebars.precompile($this.html()));
+    htmlObject.layouts.data.push(p);
+  });
+
+  cheerioTmps.each(function (i, elem) {
+    var p = {};
+    var $this = $(this);
+
+    p.name = $this.attr('name');
+    // p.layout = $this.attr('layout') || null;
+    // p.rawHTML = $this.html();
+    htmlObject.templates.tmps.push(Handlebars.precompile($this.html()));
+    htmlObject.templates.data.push(p);
   });
 
   reader.postal.publish({

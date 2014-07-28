@@ -10,12 +10,13 @@ var Builder = function (postal, settings) {
   var builder = this;
   builder.postal = postal;
   builder.settings = settings;
+  builder.htmlFiles = [];
 
   builder.postal.subscribe({
     channel: 'HTML',
     topic:   'discovered',
     callback: builder.captureFile
-  });
+  }).withContext(builder);
 
   builder.postal.subscribe({
     channel: 'HTML',
@@ -26,7 +27,8 @@ var Builder = function (postal, settings) {
 };
 
 Builder.prototype.captureFile = function (data) {
-  logger.info('caputre file');
+  this.htmlFiles.push(data);
+  logger.info('Data pushed into html files');
 };
 
 Builder.prototype.compileSite = function () {
@@ -48,54 +50,52 @@ Builder.prototype.compileSite = function () {
   var jsPath = path.join(buildLoc, '/js');
   var cssPath = path.join(buildLoc, '/stylesheets');
   var bowerPath = path.join(buildLoc, '/bower_components');
+
+  fs.ensureDirSync(jsPath);
+  fs.ensureDirSync(cssPath);
+  fs.ensureDirSync(bowerPath);
+
   fs.copy(binDir + '/client/js', jsPath);
   fs.copy(binDir + '/client/stylesheets', cssPath);
   fs.copy(binDir + '/client/bower_components', bowerPath);
   fs.copy(binDir + '/client/html/index.html', buildLoc + '/index.html');
   fs.copy(binDir + '/client/html/iframe.html', buildLoc + '/iframe.html');
 
-  // appendTemplates(tmpArr, dest, type);
-  // appendObject(objArr, dir, type);
+  builder.htmlFiles.forEach(function (element, index, array) {
+    var keys = Object.keys(element);
+    for (key in element) {
+      builder.appendTemplates(element[key].tmps, buildLoc, key);
+      builder.appendObject(element[key].data, buildLoc, key);
+    }
+    // logger.info(keys);
+  });
 };
 
 Builder.prototype.appendTemplates = function (templateArray, dir, type) {
-  var newFilePath = path.join(dir, type + '.js');
+  var newFilePath = path.join(dir, 'js', type + '.js');
   try {
-    fs.appendFile(newFilePath, "var " + type + "Tmps = [", function (err) {
-      if (err) throw err;
-      console.log('The "data to append" was appended to file!');
-    });
+    fs.appendFileSync(newFilePath, "var " + type + "Tmps = [");
 
     templateArray.forEach(function(element, index, array) {
-      fs.appendFile(newFilePath, element, function (err) {
-        if (err) throw err;
-        console.log('The "data to append" was appended to file!');
-      });
+      fs.appendFileSync(newFilePath, element);
       if (array.length - 1 !== index) {
-        fs.appendFile(newFilePath, ", ", function (err) {
-          if (err) throw err;
-          console.log('The "data to append" was appended to file!');
-        });
+        fs.appendFileSync(newFilePath, ", ");
       }
     });
 
-    fs.appendFile(newFilePath, "];\n", function (err) {
-      if (err) throw err;
-      console.log('The "data to append" was appended to file!');
-    });
+    fs.appendFileSync(newFilePath, "];\n");
     return true;
   } catch (err) {
     logger.error(err);
     return false;
+  } finally {
+
   }
 };
 
 Builder.prototype.appendObject = function (objArr, dir, type) {
-  var newFilePath = path.join(dir, type + '.js');
-  fs.appendFile(newFilePath, "var " + type + "Data = " + JSON.stringify(objArr) + ";\n", function (err) {
-    if (err) throw err;
-    console.log('The "data to append" was appended to file!');
-  });
+  var newFilePath = path.join(dir, 'js', type + '.js');
+  fs.appendFileSync(newFilePath, "var " + type + "Data = " + JSON.stringify(objArr) + ";\n");
 };
 
 module.exports = Builder;

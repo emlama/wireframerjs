@@ -40,10 +40,8 @@ App.files = {
   otherFiles: []
 };
 
-var reader = new Reader(postal, App.settings);
 var builder = new Builder(postal, App.settings);
+var reader = new Reader(postal, App.settings);
 var server = new Server(postal, App.settings);
 
 server.startServer();
-
-// logger.info(process.cwd());
