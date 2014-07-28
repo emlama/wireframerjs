@@ -1,3 +1,12 @@
+<head>
+  <link rel="stylesheet" href="styles/normalize.css">
+  <link rel="stylesheet" href="styles/styles.css">
+</head>
+
+<head>
+  <title>Foobar</title>
+</head>
+
 <layout name="default">
   <div id="contain">
     {{> nav}}
@@ -9,9 +18,9 @@
 
 <page name="main" layout="default">
   <section class="col1">
-    <p>Aenean lacinia biben  dum nulla sed consectetur. Nulla vitae elit libero, a pharetra augue. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo.</p>
+    <p>Aenean lacinia biben  dum nulla sed consectetur. Nulla vitae elit libero, a pharetra augue. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Duis mollis, est non commodo luctus, nisi   erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo.</p>
 
-    <p>Etiam porta sem malesuada magna mollis euismod. Nulla vitae elit libero, a pharetra augue. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+    <p>Etiam porta   sem malesuada magna mollis euismod. Nulla vitae elit libero, a pharetra augue. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
 
     <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus auctor fringilla. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras justo odio, dapibus ac facilisis in, egestas eget quam.</p>
 
@@ -28,28 +37,14 @@
 </page>
 
 <template name="nav">
-  <variation name="default">
-    <nav>
-      <h1>Prototype</h1>
-      <ul>
-        <li><a href="">Home</a></li>
-        <li><a href="">About</a></li>
-        <li><a href="">Contact</a></li>
-        <li><a href="">Foobar</a></li>
-        <li><a href="">Settings</a></li>
-      </ul>
-    </nav>
-  </variation>
-  <variation name="alternate">
-    <nav>
-      <h1>Prototype Idea A</h1>
-      <ul>
-        <li><a href="">Home</a></li>
-        <li><a href="">About</a></li>
-        <li><a href="">Contact</a></li>
-        <li><a href="">Foobar</a></li>
-        <li><a href="">Settings</a></li>
-      </ul>
-    </nav>
-  </variation>
+  <nav>
+    <h1>Prototype</h1>
+    <ul>
+      <li><a href="">Home</a></li>
+      <li><a href="">About</a></li>
+      <li><a href="">Contact</a></li>
+      <li><a href="">Foobar</a></li>
+      <li><a href="">Settings</a></li>
+    </ul>
+  </nav>
 </template>
