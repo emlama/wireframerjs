@@ -22,6 +22,7 @@ App.getParams = function () {
 
 $(function() {
 
+  // init
   App.currentPage = App.getParams().page;
   console.log("current page is " + App.currentPage);
 
@@ -39,11 +40,12 @@ $(function() {
     array[index].tmp = Handlebars.template(layoutsTmps[index]);
   });
 
+  // end init
+
+  // render page
   var pageObj = _.find(pagesData, function (o) {
     return o.name === App.currentPage;
   });
-
-  console.log(pageObj);
 
   if (pageObj.layout !== undefined) {
     // Overwrite Yield partial with our page
@@ -61,7 +63,7 @@ $(function() {
 
   // BOOM all there is and ever was
   $('body').html(newTemplate);
-  // we get a normal Location object
+  // end render
 
   /*
    * Note, this is the only difference when using this library,
