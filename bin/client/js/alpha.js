@@ -7,8 +7,15 @@
 var WF = WF || {};
 
 $(function () {
+  var loc = window.location.pathname.slice(1);
+
+  // By default look for the "main" page
+  if (loc === "") {
+    loc = "main";
+  }
+
   var i = document.createElement("iframe");
-  i.src = "iframe.html?page=main";
+  i.src = "iframe.html?page=" + loc;
   i.scrolling = "auto";
   i.frameborder = "0";
   i.width = "100%";

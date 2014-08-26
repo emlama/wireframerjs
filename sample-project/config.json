@@ -1,4 +1,6 @@
 {
   "livereload": true,
-  "launchonload": false
+  "launchonload": true,
+  "server": true,
+  "port": 3000
 }

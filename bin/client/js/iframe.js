@@ -20,36 +20,47 @@ App.getParams = function () {
   return urlParams;
 };
 
-App.currentPage = App.getParams().page;
-
-_.each(templatesData, function (element, index, array) {
-  array[index].tmp = Handlebars.template(templatesTmps[index]);
-  Handlebars.registerPartial(element.name, Handlebars.template(templatesTmps[index]));
-});
-
-_.each(pagesData, function (element, index, array) {
-  array[index].tmp = Handlebars.template(pagesTmps[index]);
-  Handlebars.registerPartial(element.name, Handlebars.template(pagesTmps[index]));
-});
-
-_.each(layoutsData, function (element, index, array) {
-  array[index].tmp = Handlebars.template(layoutsTmps[index]);
-});
-
-var pageObj = _.find(pagesData, function (o) {
-  return o.name === App.currentPage;
-});
-
-if (pageObj.layout !== undefined && pageObj.layout !== undefined) {
-  Handlebars.registerPartial('yield', Handlebars.template(pagesTmps[0]));
-  pageObj = layoutsData[0].tmp();
-}
-
-var newTemplate = pageObj;
-
-$('body').prepend(newTemplate);
-
 $(function() {
+
+  App.currentPage = App.getParams().page;
+  console.log("current page is " + App.currentPage);
+
+  _.each(templatesData, function (element, index, array) {
+    array[index].tmp = Handlebars.template(templatesTmps[index]);
+    Handlebars.registerPartial(element.name, Handlebars.template(templatesTmps[index]));
+  });
+
+  _.each(pagesData, function (element, index, array) {
+    array[index].tmp = Handlebars.template(pagesTmps[index]);
+    Handlebars.registerPartial(element.name, Handlebars.template(pagesTmps[index]));
+  });
+
+  _.each(layoutsData, function (element, index, array) {
+    array[index].tmp = Handlebars.template(layoutsTmps[index]);
+  });
+
+  var pageObj = _.find(pagesData, function (o) {
+    return o.name === App.currentPage;
+  });
+
+  console.log(pageObj);
+
+  if (pageObj.layout !== undefined) {
+    // Overwrite Yield partial with our page
+    Handlebars.registerPartial('yield', pageObj.tmp());
+
+    // Find our layout
+    var layoutObj = _.find(layoutsData, function (o) {
+      return o.name === pageObj.layout;
+    });
+
+    pageObj = layoutObj.tmp();
+  }
+
+  var newTemplate = pageObj;
+
+  // BOOM all there is and ever was
+  $('body').html(newTemplate);
   // we get a normal Location object
 
   /*
@@ -83,4 +94,4 @@ $(function() {
     // just post
     alert("We returned to the page with a link: " + location.href);
   });
-  });
+});

@@ -4,22 +4,25 @@ var fs = require('fs-extra');
 var _ = require('underscore');
 var Handlebars = require('handlebars');
 var utils = require('./utils');
+
 var chokidar = require('chokidar');
+var postal = require('postal');
 var walk = require('walk');
+
 var logger = require('tracer').colorConsole({
   format : "{{timestamp}} {{title}}:Reader  >> {{message}}",
   dateformat : "HH:MM:ss.l",
   level:'info'
 });
 
-var Reader = function (postal, settings) {
+var Reader = function (settings) {
   var reader = this;
   reader.postal = postal;
   reader.settings = settings;
   reader.interval = 1;
   reader.compileNeeded = false;
 
-  reader.sourceDir = settings.site;
+  reader.sourceDir = reader.settings.site;
 
   // reader.postal.subscribe({
   //   channel: 'Sites',
@@ -34,20 +37,23 @@ Reader.prototype.watch = function () {
   var reader = this;
 
   reader.watcher = chokidar.watch(reader.sourceDir, {ignored: /[\/\\]\./, persistent: true});
+
   reader.watcher.on('add', function(path) {
-    // console.log('File', path, 'has been added');
+    // logger.debug('File', path, 'has been added');
     if (path.indexOf(reader.settings.buildLocation) === -1) {
       reader.compileNeeded = true;
     }
   });
+
   reader.watcher.on('change', function(path, stats) {
-    // console.log('File', path, 'changed size to', stats.size);
+    // logger.debug('File', path, 'changed size to', stats.size);
     if (path.indexOf(reader.settings.buildLocation) === -1) {
       reader.compileNeeded = true;
     }
   });
+
   reader.watcher.on('addDir', function(path) {
-    // console.log('Dir ', path, ' has been added');
+    // logger.debug('Dir ', path, ' has been added');
     if (path.indexOf(reader.settings.buildLocation) === -1) {
       reader.compileNeeded = true;
     }
@@ -167,7 +173,7 @@ Reader.prototype.processSiteFiles = function () {
 
   var options = {
     followLinks: false,
-    filters: ["_site"]
+    filters: [reader.settings.dest]
   };
 
   walker = walk.walk(reader.sourceDir, options);

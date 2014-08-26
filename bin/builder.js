@@ -1,13 +1,14 @@
 var fs = require('fs-extra');
 var path = require('path');
 var Handlebars = require('handlebars');
+var postal = require('postal');
 var logger = require('tracer').colorConsole({
   format : "{{timestamp}} {{title}}:Builder >> {{message}}",
   dateformat : "HH:MM:ss.l",
   level:'info'
 });
 
-var Builder = function (postal, settings) {
+var Builder = function (settings) {
   var builder = this;
   builder.postal = postal;
   builder.settings = settings;
@@ -36,20 +37,20 @@ var Builder = function (postal, settings) {
 
 Builder.prototype.captureHTMLFile = function (data) {
   this.htmlFiles.push(data);
-  logger.info('Data pushed into html files');
+  logger.debug('Data pushed into html files');
 };
 
 Builder.prototype.captureDoc = function (data) {
   this.documents.push(data);
-  logger.info('Data pushed into documents');
+  logger.debug('Data pushed into documents');
 };
 
 Builder.prototype.compileSite = function () {
-  logger.info('Compiling site');
-  var builder = this;
-  var buildLoc = builder.settings.buildLocation;
-  var binDir = builder.settings.binPath;
-  var iframeHead = '';
+  logger.info('Compiling site...');
+  var builder     = this;
+  var buildLoc    = builder.settings.buildLocation;
+  var binDir      = builder.settings.binPath;
+  var iframeHead  = '';
 
   /**
    * Right now I'm just wiping the old directory away
@@ -88,7 +89,7 @@ Builder.prototype.compileSite = function () {
   builder.documents.forEach(function (element, index, array) {
     var basePath = element.replace(builder.settings.site, "");
     var target = path.join(buildLoc, basePath);
-    fs.copy(element, target);
+    fs.copySync(element, target);
   });
 
   // Reset html files to nothing
@@ -99,10 +100,10 @@ Builder.prototype.compileSite = function () {
   var iframe = Handlebars.compile(rawIframe);
   fs.writeFileSync(buildLoc + '/iframe.html', iframe());
 
-  fs.copy(binDir + '/client/js', jsPath);
-  fs.copy(binDir + '/client/stylesheets', cssPath);
-  fs.copy(binDir + '/client/bower_components', bowerPath);
-  fs.copy(binDir + '/client/html/index.html', buildLoc + '/index.html');
+  fs.copySync(binDir + '/client/js', jsPath);
+  fs.copySync(binDir + '/client/stylesheets', cssPath);
+  fs.copySync(binDir + '/client/bower_components', bowerPath);
+  fs.copySync(binDir + '/client/html/index.html', buildLoc + '/index.html');
   // fs.copy(binDir + '/client/html/iframe.html', buildLoc + '/iframe.html');
 
 };

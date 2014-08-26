@@ -1,4 +1,5 @@
 var livereload = require('livereload');
+// var postal = require('postal');
 var staticServer = require('node-static');
 var opener = require('open');
 var logger = require('tracer').colorConsole({
@@ -7,13 +8,11 @@ var logger = require('tracer').colorConsole({
   level:'info'
 });
 
-var Server = function (postal, settings) {
+var Server = function (settings) {
   var server = this;
 
-  server.postal = postal;
+  // server.postal = postal;
   server.settings = settings;
-
-  // server.startServer();
 };
 
 Server.prototype.startServer = function () {
@@ -36,17 +35,17 @@ Server.prototype.runServer = function (path) {
   var simpleServer = new staticServer.Server(path, { cache: false });
 
   require('http').createServer(function (request, response) {
-      request.addListener('end', function () {
-          simpleServer.serve(request, response, function (e, res) {
-            if (e && (e.status === 404)) {
-              simpleServer.serveFile('/index.html', 200, {}, request, response);
-            }
-          });
-      }).resume();
-  }).listen(3000);
+    request.addListener('end', function () {
+      simpleServer.serve(request, response, function (e, res) {
+        if (e && (e.status === 404)) {
+          simpleServer.serveFile('/index.html', 200, {}, request, response);
+        }
+      });
+    }).resume();
+  }).listen(this.settings.port);
 
   if (this.settings.launchonload === true) {
-    opener('http://localhost:3000/');
+    opener('http://localhost:' + this.settings.port +'/');
   }
 };
 
