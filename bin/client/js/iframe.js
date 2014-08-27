@@ -21,31 +21,6 @@ App.getParams = function () {
 };
 
 App.renderPage = function (pageName) {
-  // // If no argument is passed, render the current page.
-  // pageName = pageName || this.currentPage;
-
-  // // render page
-  // var pageObj = _.find(pagesData, function (o) {
-  //   return o.name === App.currentPage;
-  // });
-
-  // if (pageObj.layout !== undefined) {
-  //   // Overwrite Yield partial with our page
-  //   Handlebars.registerPartial('yield', pageObj.tmp());
-
-  //   // Find our layout
-  //   var layoutObj = _.find(layoutsData, function (o) {
-  //     return o.name === pageObj.layout;
-  //   });
-
-  //   pageObj = layoutObj.tmp();
-  // }
-
-  // var newTemplate = pageObj;
-
-  // // BOOM all there is and ever was
-  // $('body').html(newTemplate);
-  // // end render
 };
 
 $(function() {
@@ -77,7 +52,7 @@ $(function() {
     return o.data.name === App.currentPage;
   });
 
-  if (pageObj.data.layout !== undefined) {
+  if (pageObj.data.layout && pageObj.data.layout !== null) {
     // Overwrite Yield partial with our page
     Handlebars.registerPartial('yield', pageObj.template());
 
@@ -86,10 +61,10 @@ $(function() {
       return o.data.name === pageObj.data.layout;
     });
 
-    pageObj = layoutObj.template();
+    pageObj = layoutObj;
   }
 
-  var newTemplate = pageObj;
+  var newTemplate = pageObj.template();
 
   // BOOM all there is and ever was
   $('body').html(newTemplate);

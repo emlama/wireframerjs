@@ -83,7 +83,6 @@ Builder.prototype.compileSite = function () {
   Handlebars.registerPartial('head', iframeHead);
   var rawIframe = fs.readFileSync(binDir + '/client/html/iframe.handlebars', 'utf8');
   var iframe = Handlebars.compile(rawIframe);
-  console.log(iframeHead);
   fs.writeFileSync(buildLoc + '/iframe.html', iframe());
 
   for (var k in buildPaths) {
