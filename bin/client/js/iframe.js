@@ -20,43 +20,73 @@ App.getParams = function () {
   return urlParams;
 };
 
+App.renderPage = function (pageName) {
+  // // If no argument is passed, render the current page.
+  // pageName = pageName || this.currentPage;
+
+  // // render page
+  // var pageObj = _.find(pagesData, function (o) {
+  //   return o.name === App.currentPage;
+  // });
+
+  // if (pageObj.layout !== undefined) {
+  //   // Overwrite Yield partial with our page
+  //   Handlebars.registerPartial('yield', pageObj.tmp());
+
+  //   // Find our layout
+  //   var layoutObj = _.find(layoutsData, function (o) {
+  //     return o.name === pageObj.layout;
+  //   });
+
+  //   pageObj = layoutObj.tmp();
+  // }
+
+  // var newTemplate = pageObj;
+
+  // // BOOM all there is and ever was
+  // $('body').html(newTemplate);
+  // // end render
+};
+
 $(function() {
 
-  // init
+  // Update all of dis!
+  _.each(templatesTmps, function (element, index, array) {
+    array[index].template = Handlebars.template(array[index].tmp);
+    Handlebars.registerPartial(element.data.name, Handlebars.template(array[index].tmp));
+  });
+
+  _.each(pagesTmps, function (element, index, array) {
+    array[index].template = Handlebars.template(array[index].tmp);
+    // Handlebars.registerPartial(element.name, Handlebars.template(pagesTmps[index]));
+  });
+
+  _.each(layoutsTmps, function (element, index, array) {
+    array[index].template = Handlebars.template(array[index].tmp);
+  });
+  // end init
+
   App.currentPage = App.getParams().page;
   console.log("current page is " + App.currentPage);
 
-  _.each(templatesData, function (element, index, array) {
-    array[index].tmp = Handlebars.template(templatesTmps[index]);
-    Handlebars.registerPartial(element.name, Handlebars.template(templatesTmps[index]));
-  });
-
-  _.each(pagesData, function (element, index, array) {
-    array[index].tmp = Handlebars.template(pagesTmps[index]);
-    Handlebars.registerPartial(element.name, Handlebars.template(pagesTmps[index]));
-  });
-
-  _.each(layoutsData, function (element, index, array) {
-    array[index].tmp = Handlebars.template(layoutsTmps[index]);
-  });
-
-  // end init
+  // If no argument is passed, render the current page.
+  var pageName = pageName || this.currentPage;
 
   // render page
-  var pageObj = _.find(pagesData, function (o) {
-    return o.name === App.currentPage;
+  var pageObj = _.find(pagesTmps, function (o) {
+    return o.data.name === App.currentPage;
   });
 
-  if (pageObj.layout !== undefined) {
+  if (pageObj.data.layout !== undefined) {
     // Overwrite Yield partial with our page
-    Handlebars.registerPartial('yield', pageObj.tmp());
+    Handlebars.registerPartial('yield', pageObj.template());
 
     // Find our layout
-    var layoutObj = _.find(layoutsData, function (o) {
-      return o.name === pageObj.layout;
+    var layoutObj = _.find(layoutsTmps, function (o) {
+      return o.data.name === pageObj.data.layout;
     });
 
-    pageObj = layoutObj.tmp();
+    pageObj = layoutObj.template();
   }
 
   var newTemplate = pageObj;

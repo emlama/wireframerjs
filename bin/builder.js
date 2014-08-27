@@ -35,16 +35,6 @@ var Builder = function (settings) {
 
 };
 
-Builder.prototype.captureHTMLFile = function (data) {
-  this.htmlFiles.push(data);
-  logger.debug('Data pushed into html files');
-};
-
-Builder.prototype.captureDoc = function (data) {
-  this.documents.push(data);
-  logger.debug('Data pushed into documents');
-};
-
 Builder.prototype.compileSite = function () {
   logger.info('Compiling site...');
   var builder     = this;
@@ -60,79 +50,92 @@ Builder.prototype.compileSite = function () {
    */
   fs.removeSync(buildLoc);
 
-  // TODO refactor into a simple _.each loop
-  // TODO catch errors
-  var jsPath = path.join(buildLoc, '/js');
-  var cssPath = path.join(buildLoc, '/stylesheets');
-  var bowerPath = path.join(buildLoc, '/bower_components');
+  var buildPaths = {
+    jsPath: '/js',
+    cssPath: '/stylesheets',
+    bowerPath: '/bower_components'
+  };
 
-  fs.ensureDirSync(jsPath);
-  fs.ensureDirSync(cssPath);
-  fs.ensureDirSync(bowerPath);
+  for (var key in buildPaths) {
+    fs.ensureDirSync( path.join(buildLoc, buildPaths[key]) );
+  }
 
   builder.htmlFiles.forEach(function (element, index, array) {
-    var keys = Object.keys(element);
-    for (key in element) {
+    for (var key in element) {
       if (key === 'heads') {
-        iframeHead = element[key].tmps.join("");
+        iframeHead = element[key].tmps.join(" ");
       } else {
-        builder.appendTemplates(element[key].tmps, buildLoc, key);
-        builder.appendObject(element[key].data, buildLoc, key);
+        builder.appendTemplates(element[key].tmps, element[key].data, buildLoc, key);
       }
     }
-    // logger.info(keys);
   });
 
-  // Reset html files to nothing
-  builder.htmlFiles = [];
+  builder.htmlFiles = []; // Reset html files to nothing
 
   builder.documents.forEach(function (element, index, array) {
-    var basePath = element.replace(builder.settings.site, "");
+    var basePath = element.replace(builder.settings.site, '');
     var target = path.join(buildLoc, basePath);
     fs.copySync(element, target);
   });
 
-  // Reset html files to nothing
-  builder.documents = [];
+  builder.documents = []; // Reset html files to nothing
 
   Handlebars.registerPartial('head', iframeHead);
   var rawIframe = fs.readFileSync(binDir + '/client/html/iframe.handlebars', 'utf8');
   var iframe = Handlebars.compile(rawIframe);
+  console.log(iframeHead);
   fs.writeFileSync(buildLoc + '/iframe.html', iframe());
 
-  fs.copySync(binDir + '/client/js', jsPath);
-  fs.copySync(binDir + '/client/stylesheets', cssPath);
-  fs.copySync(binDir + '/client/bower_components', bowerPath);
-  fs.copySync(binDir + '/client/html/index.html', buildLoc + '/index.html');
-  // fs.copy(binDir + '/client/html/iframe.html', buildLoc + '/iframe.html');
+  for (var k in buildPaths) {
+    fs.copySync(
+        path.join(binDir, '/client/', buildPaths[k]),
+        path.join(buildLoc, buildPaths[k])
+      );
+  }
 
+  fs.copySync(
+      path.join(binDir, '/client/html/index.html'),
+      path.join(buildLoc, '/index.html')
+    );
 };
 
-Builder.prototype.appendTemplates = function (templateArray, dir, type) {
+Builder.prototype.appendTemplates = function (templateArray, objArr, dir, type) {
   var newFilePath = path.join(dir, 'js', type + '.js');
   try {
-    fs.appendFileSync(newFilePath, "var " + type + "Tmps = [");
+    fs.appendFileSync(newFilePath, 'var ' + type + 'Tmps = [');
 
     templateArray.forEach(function(element, index, array) {
-      fs.appendFileSync(newFilePath, element);
+      fs.appendFileSync(newFilePath,
+          '{"tmp":' +
+          element +
+          ',' +
+          '"data":' +
+          JSON.stringify(objArr[index]) +
+          '}'
+        );
       if (array.length - 1 !== index) {
-        fs.appendFileSync(newFilePath, ", ");
+        fs.appendFileSync(newFilePath, ', ');
       }
     });
 
-    fs.appendFileSync(newFilePath, "];\n");
+    fs.appendFileSync(newFilePath, '];\n');
+
     return true;
   } catch (err) {
     logger.error(err);
     return false;
-  } finally {
-
   }
 };
 
-Builder.prototype.appendObject = function (objArr, dir, type) {
-  var newFilePath = path.join(dir, 'js', type + '.js');
-  fs.appendFileSync(newFilePath, "var " + type + "Data = " + JSON.stringify(objArr) + ";\n");
+// Used to capture notices from reader.js
+Builder.prototype.captureHTMLFile = function (data) {
+  this.htmlFiles.push(data);
+  logger.debug('Data pushed into html files');
+};
+
+Builder.prototype.captureDoc = function (data) {
+  this.documents.push(data);
+  logger.debug('Data pushed into documents');
 };
 
 module.exports = Builder;

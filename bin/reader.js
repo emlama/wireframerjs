@@ -1,13 +1,12 @@
 var cheerio = require('cheerio');
 var path = require('path');
 var fs = require('fs-extra');
-var _ = require('underscore');
 var Handlebars = require('handlebars');
-var utils = require('./utils');
-
 var chokidar = require('chokidar');
 var postal = require('postal');
 var walk = require('walk');
+// var _ = require('underscore');
+// var utils = require('./utils');
 
 var logger = require('tracer').colorConsole({
   format : "{{timestamp}} {{title}}:Reader  >> {{message}}",
@@ -21,17 +20,10 @@ var Reader = function (settings) {
   reader.settings = settings;
   reader.interval = 1;
   reader.compileNeeded = false;
-
   reader.sourceDir = reader.settings.site;
 
-  // reader.postal.subscribe({
-  //   channel: 'Sites',
-  //   topic:   'added',
-  //   callback: reader.addSite
-  // }).withContext(reader);
-
   reader.watch();
-}
+};
 
 Reader.prototype.watch = function () {
   var reader = this;
@@ -88,12 +80,15 @@ Reader.prototype.processHTMLFile = function (file) {
   var source = fs.readFileSync(file);
   var $ = cheerio.load(source, { decodeEntities: false });
 
-  // gather up layouts
-  var cheerioLayouts = $('layout');
-  var cheerioPages = $('page');
-  var cheerioTmps = $('template');
-  var cheerioHeads = $('head');
+  // Partion out what we want
+  var objs = {
+    layouts: $('layout'),
+    pages: $('page'),
+    templates: $('template'),
+    heads: $('head')
+  };
 
+  // Setup datastore
   var htmlObject = {
     layouts: {
       data: [],
@@ -108,58 +103,31 @@ Reader.prototype.processHTMLFile = function (file) {
       tmps: []
     },
     heads: {
-      data: [],
       tmps: []
     }
+  };
+
+  // Map data in
+  for (var key in objs) {
+    objs[key].each(function (i, elem) {
+      var p = {};
+      var $this = $(this);
+
+      p.name = $this.attr('name');
+
+      if (key === 'pages') {
+        p.layout = $this.attr('layout') || null;
+      }
+
+      if (key !== 'heads') {
+        htmlObject[key].data.push(p);
+        // Templates are recompiled at this point
+        htmlObject[key].tmps.push(Handlebars.precompile( $this.html() ));
+      } else {
+        htmlObject[key].tmps.push( $this.html().trim()  );
+      }
+    });
   }
-
-  /**
-   * Reduce this down into a loop/function
-   */
-  cheerioPages.each(function (i, elem) {
-    var p = {};
-    var $this = $(this);
-
-    p.name = $this.attr('name');
-    p.layout = $this.attr('layout') || null;
-    // p.rawHTML = $this.html();
-    htmlObject.pages.tmps.push(Handlebars.precompile($this.html()));
-    htmlObject.pages.data.push(p);
-  });
-
-  cheerioLayouts.each(function (i, elem) {
-    var p = {};
-    var $this = $(this);
-
-    p.name = $this.attr('name');
-    // p.layout = $this.attr('layout') || null;
-    // p.rawHTML = $this.html();
-    htmlObject.layouts.tmps.push(Handlebars.precompile($this.html()));
-    htmlObject.layouts.data.push(p);
-  });
-
-  cheerioTmps.each(function (i, elem) {
-    var p = {};
-    var $this = $(this);
-
-    p.name = $this.attr('name');
-    // p.layout = $this.attr('layout') || null;
-    // p.rawHTML = $this.html();
-    htmlObject.templates.tmps.push(Handlebars.precompile($this.html()));
-    htmlObject.templates.data.push(p);
-  });
-
-  cheerioHeads.each(function (i, elem) {
-    var p = {};
-    var $this = $(this);
-    var html = $this.html().trim();
-
-    // p.name = $this.attr('name');
-    // p.layout = $this.attr('layout') || null;
-    // p.rawHTML = $this.html();
-    htmlObject.heads.tmps.push($this.html());
-    // htmlObject.templates.data.push(p);
-  });
 
   reader.postal.publish({
     channel: 'HTML',
@@ -178,7 +146,7 @@ Reader.prototype.processSiteFiles = function () {
 
   walker = walk.walk(reader.sourceDir, options);
   walker.on("file", function (root, fileStats, next) {
-    var file = path.join(root, fileStats.name)
+    var file = path.join(root, fileStats.name);
     fs.readFile(file, function () {
       var ext = path.extname(file).toLowerCase();
 
