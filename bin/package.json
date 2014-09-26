@@ -25,5 +25,9 @@
   },
   "bin": {
     "wireframer": "./index.js"
+  },
+  "devDependencies": {
+    "gulp-util": "^3.0.1",
+    "through2": "^0.6.2"
   }
 }

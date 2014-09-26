@@ -2,3 +2,4 @@ bin/node_modules/
 bin/client/bower_components/
 bin/client/.sass-cache/
 sample-project/_site/
+sample-project/node_modules/
