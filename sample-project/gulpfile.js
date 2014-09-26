@@ -38,8 +38,10 @@ gulp.task('watch', function () {
   gulp.watch(['**/*', '!**/*.js', '!**/*.html', '!_site/**', '!node_modules/**'], ['copyFiles']);
 });
 
-gulp.task('clean', function () {
+// https://github.com/gulpjs/gulp/blob/master/docs/recipes/running-tasks-in-series.md
+gulp.task('clean', function (cb) {
   fs.removeSync(paths.site);
+  cb();
 });
 
-gulp.task('default', ['clean', 'buildTmps', 'buildJs', 'copyFiles', 'watch']);
+gulp.task('default', ['clean', 'buildJs', 'copyFiles', 'buildTmps']);
